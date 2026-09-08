@@ -18,7 +18,7 @@ class TestQuizCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(description = "запуск ручной викторины")
     @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
     async def quiz(self, ctx: Context, channel: TextChannel = None):
         if not channel:

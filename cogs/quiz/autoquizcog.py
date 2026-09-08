@@ -20,7 +20,7 @@ class TestAutoquizCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(description = "запуск автоматической викторины")
     @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
     async def autoquiz(self, ctx: Context):
         json_dict = json_manage.read("list", dir = dir)
@@ -69,7 +69,7 @@ class TestAutoquizCog(Cog):
 
 
 
-    @commands.command()
+    @commands.command(description = "добавление файлов для autoquiz")
     @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
     async def quizadd(self, ctx: Context, *, comment: str = ""):
         attachments = ctx.message.attachments
@@ -112,7 +112,7 @@ class TestAutoquizCog(Cog):
 
             
 
-    @commands.command()
+    @commands.command(description = "навигация по файлам autoquiz (не готово)")
     @check()
     async def quizsearch(self, ctx: Context):
         ...
