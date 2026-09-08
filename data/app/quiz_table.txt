@@ -1,0 +1,61 @@
+==== Question ====
+Type: FREE
+Points: 1
+# Правильный ответ и ответ пользователя должны полностью совпадать.
+== QUESTIONS ==
+RU:
+
+EN:
+
+== ANSWERS ==
+- RU -
+1:
+
+- EN -
+1:
+
+
+==== Question ====
+Type: CHOICE
+Points: 1
+# Правильным считается первый ответ.
+== QUESTIONS ==
+RU:
+
+EN:
+
+== ANSWERS ==
+- RU -
+1:
+2:
+3:
+4:
+
+- EN -
+1:
+2:
+3:
+4:
+
+
+==== Question ====
+Type: SEQUENTIAL
+Points: 1
+# Цепочка ответов собирается сверху вниз.
+== QUESTIONS ==
+RU:
+
+EN:
+
+== ANSWERS ==
+- RU -
+1:
+2:
+3:
+4:
+
+- EN -
+1:
+2:
+3:
+4:
