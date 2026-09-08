@@ -55,7 +55,7 @@ class HelpCog(commands.Cog):
                     slash += f"\n- **{slash_command.name.title()}** – {description_text} ({scope})."
                 description += slash
 
-        embed = discord.Embed(title = "Help", description = description[:3000], color = colors.RED)
+        embed = discord.Embed(description = description, color = colors.CREAM)
         await ctx.send(embed = embed)
 
 

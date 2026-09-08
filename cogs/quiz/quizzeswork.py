@@ -121,8 +121,6 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
 async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel, context: QuizContext):
     correct_answer = [question["Answers"][0]] if question["Type"] != "SEQUENTIAL" else question["Answers"].copy()
 
-
-
     data = container_to_object({"correct_answer": None,
                                 "context": context,
                                 "members": None,
@@ -152,7 +150,7 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
 
     render_message = render.Message(embeds = [render.Embed(title = text["Title"].format(str(context.number())),
                                                            description = question["Question"],
-                                                           color = colors.RED)],
+                                                           color = colors.BLUE)],
                                     view = render_view)
 
     dict_message = render.render(render_message)

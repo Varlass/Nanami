@@ -6,8 +6,8 @@ class FunCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.number = {}
-        self.funcs = [self.activity,
-                      self.reaction]
+        self.funcs = {self.activity,
+                      self.reaction}
 
     @commands.Cog.listener()
     async def on_message(self, message):

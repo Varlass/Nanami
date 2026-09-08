@@ -7,7 +7,8 @@ DIR = Path(__file__).resolve().parents[1] # Путь к текущей папк�
 
 class Init: # Создание файлов при их отсутствии.
     def __init__(self):
-        self.files: dict[Path, str] = {DIR/"quiz_data/list.json": "{}"}
+        self.files: dict[Path, str] = {DIR/"quiz_data/list.json": "{}",
+                                       DIR/"id_list.yaml": ""}
 
     def init_files(self) -> None:
         for path, data in self.files.items():
