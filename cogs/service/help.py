@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from pathlib import Path
 
 from utils.library import colors
 
@@ -12,36 +13,45 @@ class HelpCog(commands.Cog):
         description = ""
 
         if command:
-            
             cmd = self.bot.get_command(command)
+
             if cmd and await cmd.can_run(ctx):
                 description = f"- {cmd.name.title()} – {cmd.help or cmd.description or "Подробное описание отсутствует"}"
+
             else:
                 description = f"Команда `{command}` не найдена"
 
         else:
             if self.bot.commands:
                 text = "## Текстовые команды:\n"
-                for text_command in self.bot.commands:
+
+                for text_command in sorted(self.bot.commands, key = lambda command: Path(command.callback.__code__.co_filename).as_posix()):
                     try:
                         if await text_command.can_run(ctx):
                             text += f"\n- **{text_command.name.title()}** – {text_command.description or "описание отсутствует"}."
+
                     except commands.CheckFailure:
                         continue
                 description += text
             
             slash = ""
             slash_commands = list(self.bot.tree.walk_commands())
+
             if slash_commands:
                 slash = "\n## Слэш команды:\n"
+
                 for slash_command in slash_commands:
                     description_text = slash_command.description
+
                     if slash_command._guild_ids:
                         scope = "серверная"
+
                     else:
                         scope = "глобальная"
+
                     if not description_text or description_text.strip(".…") == "":
                         description_text = "описание отсутствует" 
+
                     slash += f"\n- **{slash_command.name.title()}** – {description_text} ({scope})."
                 description += slash
 

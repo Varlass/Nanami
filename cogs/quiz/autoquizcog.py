@@ -22,7 +22,7 @@ class TestAutoquizCog(Cog):
 
     @commands.command()
     @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
-    async def autoquizstart(self, ctx: Context):
+    async def autoquiz(self, ctx: Context):
         json_dict = json_manage.read("list", dir = dir)
 
         try:
@@ -71,7 +71,7 @@ class TestAutoquizCog(Cog):
 
     @commands.command()
     @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
-    async def autoquizadd(self, ctx: Context, *, comment: str = ""):
+    async def quizadd(self, ctx: Context, *, comment: str = ""):
         attachments = ctx.message.attachments
 
         if not attachments:
@@ -114,7 +114,7 @@ class TestAutoquizCog(Cog):
 
     @commands.command()
     @check()
-    async def autoquizsearch(self, ctx: Context):
+    async def quizsearch(self, ctx: Context):
         ...
 
 
