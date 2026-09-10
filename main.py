@@ -8,7 +8,7 @@ from os import getenv
 load_dotenv()
 
 from utils.check import check_list
-from data.app.manager import db_manage, DefaultData
+from data.manager import db_manage, DefaultData
 
 
 class MyBot(Bot):

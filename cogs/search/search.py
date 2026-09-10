@@ -5,7 +5,7 @@ from os import getenv
 load_dotenv()
 
 from utils.check import check, check_list
-from data.app.manager import DIR
+from data.manager import DIR
 from utils.utils import ntime
 
 
