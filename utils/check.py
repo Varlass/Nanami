@@ -2,7 +2,7 @@ from discord import Interaction
 from discord.ext.commands import Context, CheckFailure, check as ch
 from yaml import safe_load
 
-from data.app.manager import DIR
+from data.manager import DIR
 from utils.unifer import Unifer
 
 
