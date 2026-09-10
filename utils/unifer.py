@@ -17,7 +17,6 @@ class Unifer:
         self.channel = getattr(source, "channel", None)
         self.guild = getattr(source, "guild", None)
 
-
     @property
     def user_id(self) -> int|None:
         return getattr(self.user, "id", None)
