@@ -22,7 +22,7 @@ class SearchCog(commands.Cog):
         self.num = 0
 
     @commands.command(description = "поиск в интернете через ии")
-    @check({check_list["Guilds"]["Сервер_Varlass"]})
+    @check()
     async def search(self, ctx: commands.Context, *, text: str = None):
         if text == None:
             return

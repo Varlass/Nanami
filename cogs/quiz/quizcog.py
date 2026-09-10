@@ -14,12 +14,12 @@ QUESTION_TYPES = {"FREE": 1,
                   "CHOICE": 4,
                   "SEQUENTIAL": 4}
 
-class TestQuizCog(Cog):
+class QuizCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(description = "запуск ручной викторины")
-    @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
+    @check({check_list["Roles"]["Giveaways_Organiser"]})
     async def quiz(self, ctx: Context, channel: TextChannel = None):
         if not channel:
             channel = ctx.channel
@@ -82,4 +82,4 @@ class QuizModal(Modal):
         self.data["log"][self.data["context"].quiz_number] = await quiz_manager(question_dict, translate["RU"], self.data["channel"], self.data["context"])
 
 async def setup(bot: Bot):
-    await bot.add_cog(TestQuizCog(bot))
+    await bot.add_cog(QuizCog(bot))

@@ -16,12 +16,12 @@ from cogs.quiz.quizzeswork import autoquiz_manager
 dir = DIR/"quiz_data"
 langs = ["RU", "EN"]
 
-class TestAutoquizCog(Cog):
+class AutoquizCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.command(description = "запуск автоматической викторины")
-    @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
+    @check({check_list["Roles"]["Giveaways_Organiser"]})
     async def autoquiz(self, ctx: Context):
         json_dict = json_manage.read("list", dir = dir)
 
@@ -71,7 +71,7 @@ class TestAutoquizCog(Cog):
 
 
     @commands.command(description = "добавление файлов для autoquiz")
-    @check({check_list["Roles"]["Giveaways_Organiser"], check_list["Guilds"]["Сервер_Varlass"]})
+    @check({check_list["Roles"]["Giveaways_Organiser"]})
     async def quizadd(self, ctx: Context, *, comment: str = ""):
         attachments = ctx.message.attachments
 
@@ -114,7 +114,7 @@ class TestAutoquizCog(Cog):
             
 
     @commands.command(description = "навигация по файлам autoquiz (не готово)")
-    @check()
+    @check({check_list["Roles"]["Giveaways_Organiser"]})
     async def quizsearch(self, ctx: Context):
         ...
 
@@ -162,4 +162,4 @@ async def lang_select(self, interaction: Interaction):
     await interaction.response.edit_message(**render.render(self.data["message"]))
 
 async def setup(bot: Bot):
-    await bot.add_cog(TestAutoquizCog(bot))
+    await bot.add_cog(AutoquizCog(bot))

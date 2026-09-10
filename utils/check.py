@@ -1,5 +1,5 @@
 from discord import Interaction
-from discord.ext.commands import Context, CheckFailure, check
+from discord.ext.commands import Context, CheckFailure, check as ch
 from yaml import safe_load
 
 from data.app.manager import DIR
@@ -37,4 +37,4 @@ def check(checks: set[int] = set(), *, bypass: bool = True): # Декорато�
 
         raise CheckFailure()
 
-    return check(predicate)
+    return ch(predicate)
