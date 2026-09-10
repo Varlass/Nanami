@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
 
-from data.app.manager import DIR, json_manage
+from data.manager import DIR, json_manage
 from utils.data_tools.conversion import text_to_container
 from utils.check import check, check_list
 from utils.render_tools import render_factory as render
@@ -25,13 +25,12 @@ class AutoquizCog(Cog):
     async def autoquiz(self, ctx: Context):
         json_dict = json_manage.read("list", dir = dir)
 
-        try:
-            quiz_file = json_dict["quizzes"][json_dict["use"]]["name"]
-
-        except KeyError:
+        if not json_dict["use"]:
             return await ctx.send("Файлы автовикторины отсутствуют.")
 
-        with open(DIR/"quiz_data"/quiz_file, "r", encoding = 'utf-8') as file:
+        quiz_file = json_dict["quizzes"][json_dict["use"]]["name"]
+
+        with open(dir/quiz_file, "r", encoding = 'utf-8') as file:
             quiz_text = file.read()
 
         quiz_dict, _ = text_to_container(quiz_text, [])
@@ -76,7 +75,7 @@ class AutoquizCog(Cog):
         attachments = ctx.message.attachments
 
         if not attachments:
-            await ctx.reply(file = File(DIR/"app/quiz_table.txt"), mention_author = False)
+            await ctx.reply(file = File(dir/"quiz_table.txt"), mention_author = False)
 
         else:
             json_dict = json_manage.read("list", dir = dir)

@@ -1,22 +1,29 @@
 import json, sqlite3
 import copy
+from shutil import copy2
 from pathlib import Path
 
 
 DIR = Path(__file__).resolve().parents[1] # Путь к текущей папке.
 
-class Init: # Создание файлов при их отсутствии.
-    def __init__(self):
-        self.files: dict[Path, str] = {DIR/"quiz_data/list.json": "{'use': 0, 'quizzes': {}}",
-                                       DIR/"id_list.yaml": ""}
+class DefaultData: # Создание файлов при их отсутствии.
+    def __init__(self, template_dir: Path = DIR/"default_data", data_dir: Path = DIR):
+        self.template_dir = template_dir
+        self.data_dir = data_dir
 
     def init_files(self) -> None:
-        for path, data in self.files.items():
-            if path.exists():
+        for source in self.template_dir.rglob("*"):
+            if not source.is_file():
                 continue
 
-            path.parent.mkdir(parents = True, exist_ok = True)
-            path.write_text(data, encoding = "utf-8")
+            relative = source.relative_to(self.template_dir)
+            destination = self.data_dir / relative
+
+            if destination.exists():
+                continue
+
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            copy2(source, destination)
 
 
 class JsonManage: # Работа с .json

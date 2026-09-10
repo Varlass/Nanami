@@ -13,13 +13,13 @@ try:
     white_list = {check_list[category][name] for category, names in check_list["White_List"].items() for name in names if name}
 
 except KeyError:
-    white_list = {}
+    white_list = set()
 
 
 def check(checks: set[int] = set(), *, bypass: bool = True): # Декоратор проверки id.
     if not isinstance(checks, set):
         raise TypeError("Цель проверки должна быть множеством.")
-    
+
     effective_checks = checks|white_list if bypass else checks
 
     async def predicate(source: Context|Interaction) -> bool:
