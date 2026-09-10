@@ -4,7 +4,7 @@ from shutil import copy2
 from pathlib import Path
 
 
-DIR = Path(__file__).resolve().parents[1] # Путь к текущей папке.
+DIR = Path(__file__).resolve().parents[0] # Путь к текущей папке.
 
 class DefaultData: # Создание файлов при их отсутствии.
     def __init__(self, template_dir: Path = DIR/"default_data", data_dir: Path = DIR):
