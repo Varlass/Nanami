@@ -6,6 +6,7 @@ from discord.ext.commands import Cog, Bot, Context
 from utils.check import check, check_list
 from utils.render_tools import render_factory as render
 from utils.library import colors
+from utils.utils import ntime
 
 from cogs.quiz.quizzeswork import QuizContext, quiz_manager, translate
 
@@ -53,6 +54,7 @@ class QuizCog(Cog):
 
 async def question_create(self, interaction: Interaction):
     await self.data["context"].close_answer()
+    self.data["log"][self.data["context"].quiz_number]["ended_at"] = int(ntime().timestamp())
 
     modal = QuizModal(self.custom_id, self.data)
     await interaction.response.send_modal(modal)
@@ -74,7 +76,8 @@ class QuizModal(Modal):
     async def on_submit(self, interaction: Interaction):
         await interaction.response.defer()
 
-        question_dict = {"Type": self.question_type,
+        question_dict = {"Number": self.data["context"].number(),
+                         "Type": self.question_type,
                          "Question": self.children[0].value,
                          "Answers": [answer.value.strip().lower() for answer in self.children[1:]],
                          "Points": 1}

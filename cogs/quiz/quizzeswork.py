@@ -95,19 +95,25 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
     log = {}
 
     for question in quiz:
+        number = str(context.number())
+
         for lang, channel in quiz_channels.items():
             if channel == None:
                 continue
 
-            question_dict = {"Type": question["Type"],
+            question_dict = {"Number": number,
+                             "Type": question["Type"],
                              "Question": question["QUESTIONS"][lang],
-                             "Answers": [answer.strip().lower() for answer in  question["ANSWERS"][lang]],
+                             "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
                              "Points": question["Points"]}
 
-            log[context.quiz_number] = await quiz_manager(question_dict, translate[lang], channel, context)
+            log[number + "_" + lang] = await quiz_manager(question_dict, translate[lang], channel, context)
 
         await asyncio.sleep(60)
         await context.close_answer()
+
+        for lang, _ in quiz_channels.items():
+            log[number + "_" + lang]["ended_at"] = int(ntime().timestamp())
 
         if flag.is_set():
             break
@@ -119,7 +125,7 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
 
 
 async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel, context: QuizContext):
-    correct_answer = [question["Answers"][0]] if question["Type"] != "SEQUENTIAL" else question["Answers"].copy()
+    correct_answer = [question["Answers"][0].lower()] if question["Type"] != "SEQUENTIAL" else [answer.lower() for answer in question["Answers"].copy()]
 
     data = container_to_object({"correct_answer": None,
                                 "context": context,
@@ -145,10 +151,10 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
     render_view = render.View(data = data,
                        timeout = 3600,
                        buttons = [render.Button(label = answer if question["Type"] != "FREE" else text["Button_Title"],
-                                                custom_id = answer.strip().lower(),
+                                                custom_id = answer.lower(),
                                                 callback = TYPE_MAP[question["Type"]]) for answer in question["Answers"]])
 
-    render_message = render.Message(embeds = [render.Embed(title = text["Title"].format(str(context.number())),
+    render_message = render.Message(embeds = [render.Embed(title = text["Title"].format(question["Number"]),
                                                            description = question["Question"],
                                                            color = colors.BLUE)],
                                     view = render_view)

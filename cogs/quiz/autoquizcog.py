@@ -38,7 +38,7 @@ class AutoquizCog(Cog):
 
         message = render.Message(data = {"channels": channels},
                                  embeds = [render.Embed(title = "Выберите каналы для викторины:",
-                                                        description = lambda data: (f"Файл автовикторины: {quiz_file}\n"
+                                                        description = lambda data: (f"Файл автовикторины: `{quiz_file}`\n"
                                                                                     f"- RU: {data["channels"]['RU'] or 'не указан'}\n"
                                                                                     f"- EN: {data["channels"]['EN'] or 'не указан'}"),
                                                         color = colors.CREAM)],
