@@ -4,9 +4,9 @@ from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
 
 from data.manager import DIR, json_manage
-from utils.data_tools.conversion import text_to_container
+from utils.data_tools import text_to_collection
 from utils.check import check, check_list
-from utils.render_tools import render_factory as render
+from utils import render_tools as render
 from utils.utils import ntime
 from utils.library import colors
 
@@ -33,7 +33,7 @@ class AutoquizCog(Cog):
         with open(dir/quiz_file, "r", encoding = 'utf-8') as file:
             quiz_text = file.read()
 
-        quiz_dict, _ = text_to_container(quiz_text, [])
+        quiz_dict, _ = text_to_collection(quiz_text, [])
         channels = {lang: None for lang in langs}
 
         message = render.Message(data = {"channels": channels},
@@ -55,7 +55,7 @@ class AutoquizCog(Cog):
                                                                              label = "Start",
                                                                              style = ButtonStyle.blurple,
                                                                              row = 3),
-                                                                render.Button(callback = stop_button,
+                                                               render.Button(callback = stop_button,
                                                                               label = "Stop",
                                                                               custom_id = "stop_button",
                                                                               style = ButtonStyle.red,

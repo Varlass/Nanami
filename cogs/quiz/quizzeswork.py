@@ -16,12 +16,13 @@ translate = {"RU": {"Title": "Вопрос №{}",
                     "Button_End_Answer": "Your answer was heard"}}
 
 class QuizContext:
-    def __init__(self):
+    def __init__(self, quiz_type: str  = "Quiz"):
         self.log_channel: TextChannel|None = None
 
         self.quiz_number: int = 0
         self.messages: dict[Message, View] = {}
         self.points: dict[Member, int] = {}
+        self.log: dict = {"Quiz_Type": quiz_type}
 
     def number(self):
         self.quiz_number += 1
@@ -54,19 +55,19 @@ class QuizContext:
 
             await message.edit(view = view)
 
+        for lang in self.log:
+            self.log[lang][str(self.quiz_number)]["ended_at"] = int(ntime().timestamp())
+
         self.messages.clear()
 
-    async def close_quiz(self, log: dict|None = None):
-        log_file = None
-
+    async def close_quiz(self):
         await self.close_answer()
         chat, console = self.result()
 
-        if log:
-            with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
-                json.dump(log, file, ensure_ascii = False, indent = 4)
-            log_path = pathlib.Path(file.name)
-            log_file = File(log_path, filename = "quiz_log.json")
+        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
+            json.dump(self.log, file, ensure_ascii = False, indent = 4)
+        log_path = pathlib.Path(file.name)
+        log_file = File(log_path, filename = "quiz_log.json")
 
         if len("".join(chat)) <= 1950:
             await self.log_channel.send("# Викторина завершена!" + "".join(chat), file = log_file)
@@ -83,16 +84,14 @@ class QuizContext:
             finally:
                 text_path.unlink(True)
 
-        if log:
-            log_path.unlink(True)
+        log_path.unlink(True)
 
         print(f"\033[34m[{ntime().strftime("%H:%M:%S")}]\nВикторина завершена!" + "".join(console) + "\033[0m")
 
 
 async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], log_channel: TextChannel, flag: asyncio.Event):
-    context = QuizContext()
+    context = QuizContext("Autoquiz")
     context.log_channel = log_channel
-    log = {}
 
     for question in quiz:
         number = str(context.number())
@@ -107,13 +106,10 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
                              "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
                              "Points": question["Points"]}
 
-            log[number + "_" + lang] = await quiz_manager(question_dict, translate[lang], channel, context)
+            context.log[lang][number] = await quiz_manager(question_dict, translate[lang], channel, context)
 
         await asyncio.sleep(60)
         await context.close_answer()
-
-        for lang, _ in quiz_channels.items():
-            log[number + "_" + lang]["ended_at"] = int(ntime().timestamp())
 
         if flag.is_set():
             break
@@ -121,7 +117,7 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
         _, console = context.result()
         await log_channel.send("## Промежуточные результаты:" + "".join(console))
 
-    await context.close_quiz(log)
+    await context.close_quiz()
 
 
 async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel, context: QuizContext):

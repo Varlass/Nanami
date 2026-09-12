@@ -30,7 +30,7 @@ class Object:
         setattr(self, func.__name__, MethodType(func, self))
 
 
-def text_to_container(text: str, container: dict|list = None) -> tuple[dict|list, list]:
+def text_to_collection(text: str, container: dict|list = None) -> tuple[dict|list, list]:
     if container is None:
         container = []
 
@@ -52,18 +52,18 @@ def text_to_container(text: str, container: dict|list = None) -> tuple[dict|list
 
     return result, notices + bugs
 
-def container_to_object(container: dict|list|tuple, functions: list[FunctionType]|None = None) -> Object:
+def collection_to_object(container: dict|list|tuple|set, functions: list[FunctionType]|None = None) -> Object:
     if isinstance(container, dict):
         obj = Object()
 
         for key, value in container.items():
-            if isinstance(value, (dict, list, tuple)):
-                value = container_to_object(value)
+            if isinstance(value, (dict, list, tuple, set)):
+                value = collection_to_object(value)
 
             setattr(obj, key, value)
 
-    elif isinstance(container, (list, tuple)):
-        obj = Object([container_to_object(value) if isinstance(value, (dict, list, tuple)) else value for value in container])
+    elif isinstance(container, (list, tuple, set)):
+        obj = Object([collection_to_object(value) if isinstance(value, (dict, list, tuple, set)) else value for value in container])
 
     else:
         raise TypeError(f"Функция ожидает dict, list или tuple, а не {type(container)}")
@@ -74,17 +74,23 @@ def container_to_object(container: dict|list|tuple, functions: list[FunctionType
 
     return obj
 
-def object_to_container(obj: object) -> dict:
-    if isinstance(obj, dict):
-        return {key: object_to_container(value) for key, value in obj.items()}
+def object_to_collection(obj: object) -> dict:
+    if not hasattr(obj, "__dict__"):
+        raise TypeError(f"Функция ожидает object, а не {type(obj)}")
 
-    if isinstance(obj, (list, tuple)):
-        return [object_to_container(value) for value in obj]
+    def convert(value):
+        if hasattr(value, "__dict__"):
+            return {key: convert(value) for key, value in value.__dict__.items()}
 
-    if hasattr(obj, "__dict__"):
-        return {key: object_to_container(value) for key, value in obj.__dict__.items()}
+        if isinstance(value, dict):
+            return {key: convert(value) for key, value in value.items()}
 
-    return obj
+        if isinstance(value, (list, tuple, set)):
+            return [convert(value) for value in value]
+
+        return value
+
+    return convert(obj)
 
 
 def _normaliser(text: str) -> list:
