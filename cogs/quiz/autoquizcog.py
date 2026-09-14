@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, random
 from discord.ext import commands
 from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
@@ -33,7 +33,7 @@ class AutoquizCog(Cog):
         with open(dir/quiz_file, "r", encoding = 'utf-8') as file:
             quiz_text = file.read()
 
-        quiz_dict, _ = text_to_collection(quiz_text, [])
+        quiz_dict = random.shuffle(text_to_collection(quiz_text, []))
         channels = {lang: None for lang in langs}
 
         message = render.Message(data = {"channels": channels},

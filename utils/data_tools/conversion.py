@@ -29,13 +29,14 @@ class Object:
 
         setattr(self, func.__name__, MethodType(func, self))
 
+_class_cache: dict[str, type] = {}
 
-def text_to_collection(text: str, container: dict|list = None) -> tuple[dict|list, list]:
+
+def text_to_collection(text: str, container: dict|list = None, notices_handler: bool = False) -> dict|list|tuple[dict|list, list]:
     if container is None:
         container = []
 
-    result = container
-    bugs = []
+    notices = []
 
     if not isinstance(text, str):
         raise TypeError(f"Функция ожидает str, а не {type(text)}")
@@ -45,32 +46,41 @@ def text_to_collection(text: str, container: dict|list = None) -> tuple[dict|lis
 
     lines, bugs =  _normaliser(text)
     tokens = _tokeniser(lines)
-    notices = _checking(tokens, lines)
 
-    if not bugs:
-        result = _ast_builder(tokens, container)
+    if not bugs and not notices_handler:
+        return _ast_builder(tokens, container)
 
-    return result, notices + bugs
+    if notices_handler:
+        notices = _checking(tokens, lines)
 
-def collection_to_object(container: dict|list|tuple|set, functions: list[FunctionType]|None = None) -> Object:
+    return container, bugs + notices
+
+def collection_to_object(container: dict|list|tuple|set, class_name: str = "Object", functions: set[FunctionType]|None = None) -> Object:
+    if class_name not in _class_cache.keys():
+        _class_cache[class_name] = type(class_name, (Object,), {})
+    ClassObject = _class_cache[class_name]
+
     if isinstance(container, dict):
-        obj = Object()
+        obj = ClassObject()
 
         for key, value in container.items():
-            if isinstance(value, (dict, list, tuple, set)):
+            if isinstance(value, dict):
+                value = collection_to_object(value, str(key))
+
+            elif isinstance(value, (list, tuple, set)):
                 value = collection_to_object(value)
 
             setattr(obj, key, value)
 
     elif isinstance(container, (list, tuple, set)):
-        obj = Object([collection_to_object(value) if isinstance(value, (dict, list, tuple, set)) else value for value in container])
+        obj = ClassObject([collection_to_object(value) if isinstance(value, (dict, list, tuple, set)) else value for value in container])
 
     else:
-        raise TypeError(f"Функция ожидает dict, list или tuple, а не {type(container)}")
+        raise TypeError(f"Функция ожидает dict, list, tuple или set, а не {type(container)}")
 
     if functions is not None:
-        for func in functions:
-            obj._add(func)
+        for function in functions:
+            obj._add(function)
 
     return obj
 
