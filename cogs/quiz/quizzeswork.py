@@ -3,7 +3,7 @@ from discord import TextChannel, Interaction, File, Message, Member, User, TextS
 from discord.ui import Modal, View, TextInput
 
 from utils.render_tools import render_factory as render
-from utils.data_tools import container_to_object
+from utils.data_tools import collection_to_object
 from utils.library import colors
 from utils.utils import ntime
 
@@ -123,7 +123,7 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
 async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel, context: QuizContext):
     correct_answer = [question["Answers"][0].lower()] if question["Type"] != "SEQUENTIAL" else [answer.lower() for answer in question["Answers"].copy()]
 
-    data = container_to_object({"correct_answer": None,
+    data = collection_to_object({"correct_answer": None,
                                 "context": context,
                                 "members": None,
                                 "points": question["Points"],

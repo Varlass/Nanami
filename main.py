@@ -8,7 +8,7 @@ from os import getenv
 load_dotenv()
 
 from utils.check import check_list
-from data.manager import db_manage, DefaultData
+from data.manager import db_manage, default_data
 
 
 class MyBot(Bot):
@@ -73,7 +73,7 @@ bot = MyBot(command_prefix = prefix, intents = intents, help_command = None, cas
 
 if __name__ == "__main__":
     try:
-        DefaultData().init_files()
+        default_data.init_files()
         bot.run(TOKEN)
 
     finally:

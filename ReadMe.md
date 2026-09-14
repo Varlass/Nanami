@@ -4,10 +4,13 @@
 ## Ping
 - Выводит задержку соединения.
 # Quiz
-## quizstart
-## autoquizstart
-## autoquizadd
-## autoquizsearch
+## quiz
+- Запускает ручную викторину.
+## autoquiz
+- Запускает автоматическую викторину
+## quizadd
+- Добавляет файл для автоматической викторины.
+## quizsearch
 # Steal
 # Archive
 # Search

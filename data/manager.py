@@ -64,10 +64,6 @@ class JsonManage: # Работа с .json
             json.dump(data, file, indent = 4, ensure_ascii = False)
 
 
-json_manage = JsonManage()
-
-
-
 class DataBaseManage: # Работа с db.
     TYPE_MAP = {str: "TEXT",
                 int: "INTEGER",
@@ -131,4 +127,6 @@ class DataBaseManage: # Работа с db.
         self.connections.clear()
 
 
+default_data = DefaultData()
+json_manage = JsonManage()
 db_manage = DataBaseManage()

@@ -25,10 +25,10 @@ def check(checks: set[int] = set(), *, bypass: bool = True): # Декорато�
     async def predicate(source: Context|Interaction) -> bool:
         context = Unifer(source)
 
-        ids = {context.user_id,
-               *context.roles_id,
-               context.channel_id,
-               context.guild_id}
+        ids = {context.user.id,
+               *{role.id for role in context.user.roles},
+               context.channel.id,
+               context.guild.id}
         
         ids.discard(None)
 
