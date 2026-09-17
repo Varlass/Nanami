@@ -55,7 +55,7 @@ def text_to_collection(text: str, container: dict|list = None, notices_handler: 
 
     return container, bugs + notices
 
-def collection_to_object(container: dict|list|tuple|set, class_name: str = "Object", functions: set[FunctionType]|None = None) -> Object:
+def collection_to_object(container: dict|list|tuple|set, functions: set[FunctionType]|None = None, class_name: str = "Object") -> Object:
     if class_name not in _class_cache.keys():
         _class_cache[class_name] = type(class_name, (Object,), {})
     ClassObject = _class_cache[class_name]

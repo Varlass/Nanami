@@ -33,7 +33,8 @@ class AutoquizCog(Cog):
         with open(dir/quiz_file, "r", encoding = 'utf-8') as file:
             quiz_text = file.read()
 
-        quiz_dict = random.shuffle(text_to_collection(quiz_text, []))
+        quiz_dict = text_to_collection(quiz_text, [])
+        random.shuffle(quiz_dict)
         channels = {lang: None for lang in langs}
 
         message = render.Message(data = {"channels": channels},
@@ -48,7 +49,7 @@ class AutoquizCog(Cog):
                                                             "quiz": quiz_dict,
                                                             "flag": asyncio.Event()},
                                                     selects = [render.Select(callback = lang_select,
-                                                                             select_type = render.SelectType.channel,
+                                                                             select_type = render.SelectType.text_channel,
                                                                              custom_id = lang,
                                                                              placeholder = f"{lang} channel") for lang in langs],
                                                     buttons = [render.Button(callback = start_button,

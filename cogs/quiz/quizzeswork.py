@@ -17,12 +17,13 @@ translate = {"RU": {"Title": "Вопрос №{}",
 
 class QuizContext:
     def __init__(self, quiz_type: str  = "Quiz"):
+        self.quiz_type = quiz_type
         self.log_channel: TextChannel|None = None
 
         self.quiz_number: int = 0
         self.messages: dict[Message, View] = {}
         self.points: dict[Member, int] = {}
-        self.log: dict = {"Quiz_Type": quiz_type}
+        self.log: dict = {}
 
     def number(self):
         self.quiz_number += 1
@@ -63,6 +64,8 @@ class QuizContext:
     async def close_quiz(self):
         await self.close_answer()
         chat, console = self.result()
+
+        self.log = {"Quiz_Type": self.quiz_type, **self.log}
 
         with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
             json.dump(self.log, file, ensure_ascii = False, indent = 4)
@@ -106,7 +109,7 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], l
                              "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
                              "Points": question["Points"]}
 
-            context.log[lang][number] = await quiz_manager(question_dict, translate[lang], channel, context)
+            context.log.setdefault(lang, {})[number] = await quiz_manager(question_dict, translate[lang], channel, context)
 
         await asyncio.sleep(60)
         await context.close_answer()
