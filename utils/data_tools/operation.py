@@ -23,7 +23,6 @@ def fetch(container: list|dict, *, target_path: str|object = MISSING , target_va
 
     return result
 
-
 def edit(container: list|dict, change, *, target_path: str|object = MISSING , target_value: str|object = MISSING): # Изменение значения узла.
     for node in fetch(container, target_path = target_path, target_value = target_value):
         value = change(node.value) if callable(change) else change
