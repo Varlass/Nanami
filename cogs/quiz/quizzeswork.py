@@ -1,5 +1,5 @@
 import asyncio, tempfile, pathlib, random, json
-from discord import TextChannel, Interaction, File, Message, Member, User, TextStyle
+from discord import TextChannel, Interaction, File, Message, Member, TextStyle
 from discord.ui import Modal, View, TextInput
 
 from utils.render_tools import render_factory as render
@@ -46,8 +46,8 @@ class QuizContext:
 
         for channel, user_ids in self.channels.items():
             users = {user: point for user, point in self.points.items() if user.id in user_ids}
-            chat.append(f"## {channel.mention}:")
-            console.append(f"## {channel.name}:")
+            chat.append(f"\n## {channel.mention}:")
+            console.append(f"\n## {channel.name}:")
 
             for place, (user, points) in enumerate(sorted(users.items(), key = lambda user: user[1], reverse = True), 1):
                 chat.append(f"\n{place}. {user.mention}: {points};")
@@ -99,7 +99,7 @@ class QuizContext:
 
 
 async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel, flag: asyncio.Event):
-    context = QuizContext(channels = [quiz_channels.values()], quiz_type = "Autoquiz")
+    context = QuizContext(channels = [channel for channel in quiz_channels.values()], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
     for question in quiz:
@@ -224,7 +224,7 @@ def member_check(self, interaction: Interaction, *, max_answers: int|None = None
 async def end_button(self, interaction: Interaction, answer: str, max_answers: int, end_text: str):
     self.members[interaction.user.id].append(answer)
 
-    if self.member_check(interaction.user, max_answers = max_answers):
+    if self.member_check(interaction, max_answers = max_answers):
         correct = self.context.price(interaction.user, self.members[interaction.user.id], self.correct_answer, self.points)
         self.log_block["users_data"].append({"user_id": interaction.user.id,
                                             "user_name": interaction.user.name,
