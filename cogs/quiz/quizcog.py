@@ -25,7 +25,7 @@ class QuizCog(Cog):
         if not channel:
             channel = ctx.channel
 
-        context = QuizContext("Handquiz")
+        context = QuizContext(channels = [channel],quiz_type = "Handquiz")
         context.log_channel = ctx.channel
 
         message = render.Message(embeds = [render.Embed(title = "Панель управления викториной",

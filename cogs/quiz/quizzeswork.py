@@ -16,9 +16,10 @@ translate = {"RU": {"Title": "Вопрос №{}",
                     "Button_End_Answer": "Your answer was heard"}}
 
 class QuizContext:
-    def __init__(self, quiz_type: str  = "Quiz"):
+    def __init__(self, channels: list[TextChannel], quiz_type: str  = "Quiz"):
         self.quiz_type = quiz_type
         self.log_channel: TextChannel|None = None
+        self.channels: dict[TextChannel, set] = {channel: set() for channel in channels}
 
         self.quiz_number: int = 0
         self.messages: dict[Message, View] = {}
@@ -43,10 +44,15 @@ class QuizContext:
         chat = []
         console = []
 
-        for place, (user, points) in enumerate(sorted(self.points.items(), key = lambda user: user[1], reverse = True), 1):
-            chat.append(f"\n{place}. {user.mention}: {points};")
-            console.append(f"\n{place}. {user.name}: {points};")
-            
+        for channel, user_ids in self.channels.items():
+            users = {user: point for user, point in self.points.items() if user.id in user_ids}
+            chat.append(f"## {channel.mention}:")
+            console.append(f"## {channel.name}:")
+
+            for place, (user, points) in enumerate(sorted(users.items(), key = lambda user: user[1], reverse = True), 1):
+                chat.append(f"\n{place}. {user.mention}: {points};")
+                console.append(f"\n{place}. {user.name}: {points};")
+                
         return chat, console
 
     async def close_answer(self):
@@ -92,8 +98,8 @@ class QuizContext:
         print(f"\033[34m[{ntime().strftime("%H:%M:%S")}]\nВикторина завершена!" + "".join(console) + "\033[0m")
 
 
-async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[TextChannel], log_channel: TextChannel, flag: asyncio.Event):
-    context = QuizContext("Autoquiz")
+async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel, flag: asyncio.Event):
+    context = QuizContext(channels = [quiz_channels.values()], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
     for question in quiz:
@@ -165,19 +171,19 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
 
 
 async def free_button(self, interaction: Interaction):
-    if self.data.member_check(interaction.user, answer = self.custom_id):
+    if self.data.member_check(interaction, answer = self.custom_id):
         return await interaction.response.defer()
 
     await interaction.response.send_modal(FreeModal(self.data))
 
 async def choice_button(self, interaction: Interaction):
-    if self.data.member_check(interaction.user, answer = self.custom_id):
+    if self.data.member_check(interaction, answer = self.custom_id):
         return await interaction.response.defer()
 
     await self.data.end_button(interaction, self.custom_id, 1, self.data.end_text)
 
 async def sequential_button(self, interaction: Interaction):
-    if self.data.member_check(interaction.user, answer = self.custom_id):
+    if self.data.member_check(interaction, answer = self.custom_id):
         return await interaction.response.defer()
 
     await self.data.end_button(interaction, self.custom_id, len(self.view.children), self.data.end_text)
@@ -192,12 +198,21 @@ class FreeModal(Modal):
         await self.data.end_button(interaction, self.children[0].value.strip().lower(), 1, self.data.end_text)
 
 
-def member_check(self, user: User, *, max_answers: int|None = None, answer: str|None = None) -> bool:
-    if user.id not in self.members:
-        self.members[user.id] = []
+def member_check(self, interaction: Interaction, *, max_answers: int|None = None, answer: str|None = None) -> bool:
+    for channel, user_ids in self.context.channels.items():
+        if interaction.user.id in user_ids:
+            if interaction.channel != channel:
+                return True
+            break
+
+    else:
+        self.context.channels[interaction.channel].add(interaction.user.id)
+
+    if interaction.user.id not in self.members:
+        self.members[interaction.user.id] = []
         return False
 
-    answerer = self.members[user.id]
+    answerer = self.members[interaction.user.id]
     if max_answers and len(answerer) == max_answers:
         return True
 
