@@ -3,7 +3,7 @@ from warnings import warn
 from collections.abc import Callable
 from types import MethodType
 
-from .config import (SYNTAX)
+from .config import SYNTAX, CHECKING_KEY, CHECKING_VALUE
 
 
 class Object:
@@ -43,7 +43,7 @@ def normaliser(function):
     """Normalises input text into a sequence of ligical lines."""
 
     @wraps(function)
-    def wrapper(text: str) -> list:
+    def wrapper(text: str) -> list[tuple[str, int]]:
         lines = text.splitlines()
         result = []
         current_line = None
@@ -64,7 +64,7 @@ def normaliser(function):
 
             else:
                 if current_line is None:
-                    raise KeyError(f"В строке {line} отсутствует ключ.")
+                    raise KeyError(f"The key is missing from the string.\n{number}: {line}.")
 
                 current_line += "\n" + line
 
@@ -78,11 +78,11 @@ def checking(tokens: list) -> None:
     """Checks tokens for non-critical errors."""
 
     for token in tokens:
-        if token["key"] == "":
-            warn(f"Missing key in {token["index"]}", f"{token!r}", EmptyKeyWarning)
+        if token["key"] in CHECKING_KEY:
+            warn(f"Emply key at {token["path"]}", EmptyKeyWarning)
 
-        if token["value"] == "":
-            warn(f"Missing value in {token["index"]}", f"{token!r}", EmptyValueWarning)
+        if token["value"] in CHECKING_VALUE:
+            warn(f"Emply value at {token["path"]}", EmptyValueWarning)
 
 
 @normaliser
@@ -91,13 +91,11 @@ def text_tokeniser(text: str) -> list[dict]:
 
     result = []
 
-    for number, line in enumerate(text):
-        line = line[0]
-
+    for line, path in text:
         token = {"key": None,
                  "value": None,
                  "high": None,
-                 "index": number}
+                 "path": f"line {path}"}
 
         if SYNTAX["separator"] in line:
             token["key"], token["value"] = map(str.strip, line.split(SYNTAX["separator"], 1))
@@ -123,7 +121,7 @@ def collection_tokeniser(collection: dict|list|tuple|set) -> list[dict]:
     result = []
     maximum_depth = 0
 
-    def _walk(collection: dict|list|tuple|set, depth: int):
+    def _walk(collection: dict|list|tuple|set, depth: int = 1, path: str = "collection"):
         nonlocal maximum_depth
 
         if isinstance(collection, dict):
@@ -133,10 +131,19 @@ def collection_tokeniser(collection: dict|list|tuple|set) -> list[dict]:
             items = enumerate(collection, 1)
 
         for key, value in items:
+            if isinstance(collection, dict):
+                current_path = f'{path}["{key}"]'
+
+            elif isinstance(collection, set):
+                current_path = f'{path}[{value!r}]'
+
+            else:
+                current_path = f'{path}[{key - 1}]'
+
             token = {"key": key,
                     "value": value,
                     "high": None,
-                    "index": len(result)}
+                    "path": current_path}
 
             if isinstance(value, (dict, list, tuple, set)):
                 token["value"] = type(value)
@@ -144,12 +151,12 @@ def collection_tokeniser(collection: dict|list|tuple|set) -> list[dict]:
                 maximum_depth = max(maximum_depth, depth)
 
                 result.append(token)
-                _walk(value, depth + 1)
+                _walk(value, depth + 1, current_path)
 
             else:
                 result.append(token)
 
-    _walk(collection, 1)
+    _walk(collection)
 
     for token in result:
         if token["high"] is not None:
@@ -163,7 +170,7 @@ def object_tokeniser(obj: object) -> list[dict]:
     result = []
     maximum_depth = 0
 
-    def _walk(obj: object, depth: int):
+    def _walk(obj: object, depth: int = 1, path: str = "obj"):
         nonlocal maximum_depth
 
         if isinstance(obj, dict):
@@ -176,10 +183,22 @@ def object_tokeniser(obj: object) -> list[dict]:
             items = vars(obj).items()
 
         for key, value in items:
+            if hasattr(value, "__dict__"):
+                current_path = f'{path}.{key}'
+
+            elif isinstance(obj, dict):
+                current_path = f'{path}["{key}"]'
+
+            elif isinstance(obj, set):
+                current_path = f'{path}[{value!r}]'
+
+            else:
+                current_path = f'{path}[{key - 1}]'
+
             token = {"key": key,
                     "value": value,
                     "high": None,
-                    "index": len(result)}
+                    "path": current_path}
 
 
             if isinstance(value, (dict, list, tuple, set)):
@@ -196,9 +215,9 @@ def object_tokeniser(obj: object) -> list[dict]:
             maximum_depth = max(maximum_depth, depth)
 
             result.append(token)
-            _walk(value, depth + 1)
+            _walk(value, depth + 1, current_path)
 
-    _walk(obj, 1)
+    _walk(obj)
 
     for token in result:
         if token["high"] is not None:

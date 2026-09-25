@@ -4,7 +4,7 @@ from .conversion_internal import (Object, checking,
                                   text_tokeniser, text_builder,
                                   collection_tokeniser, collection_builder,
                                   object_tokeniser, object_builder)
-from .config import (DEFAULT_CLASS_NAME)
+from .config import DEFAULT_CLASS_NAME
 
 
 def text_to_collection(text: str, collection: dict|list|set) -> dict|list|set:

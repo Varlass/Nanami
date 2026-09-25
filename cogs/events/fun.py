@@ -1,6 +1,10 @@
-import random, re
+import discord, random, re
 from discord.ext import commands
 
+from utils.utils import ntime
+from utils.check import check, check_list
+
+channel_id = 1553071296110264420
 
 class FunCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -8,6 +12,20 @@ class FunCog(commands.Cog):
         self.number = {}
         self.funcs = {self.activity,
                       self.reaction}
+
+    @commands.command()
+    @check({check_list["Channels"]["испытательный-полигон"]})
+    async def price(self, ctx: commands.Context):
+        channel: discord.TextChannel = await ctx.guild.fetch_channel(channel_id)
+
+        members: set[discord.Member] = set()
+        async for message in channel.history(limit = None):
+            if message.author not in members:
+                members.add(message.author)
+
+        members = list(members)
+        random.shuffle(members)
+        await ctx.send("\n".join(f"{number}: {member.mention}" for number, member in enumerate(members, start = 1)))
 
     @commands.Cog.listener()
     async def on_message(self, message):

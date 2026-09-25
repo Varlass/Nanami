@@ -1,7 +1,13 @@
-SYNTAX = {"types": {"=": dict,
-                    "-": list,
-                    "~": set},
-          "commentary": "#",
-          "separator": ":"}
+SYNTAX = {
+"types": {"=": dict,
+          "-": list,
+          "~": set,
+          "_": tuple},
+"commentary": "#",
+"separator": ":"
+}
 
-DEFAULT_CLASS_NAME = "Object"
+DEFAULT_CLASS_NAME: str = "Object"
+
+CHECKING_KEY = frozenset({""})
+CHECKING_VALUE = frozenset()
