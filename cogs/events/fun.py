@@ -23,10 +23,10 @@ class FunCog(commands.Cog):
             if message.author not in members:
                 members.add(message.author)
 
-        members = list(members)
+        members: list[discord.Member] = list(members)
         random.shuffle(members)
-        message1 = "## Hero/Battle pass:\n" + "\n".join(f"{number}. {member}" for number, member in enumerate(members[:4], start = 1))
-        message2 = "## Set:" + "\n".join(f"{number}. {member}" for number, member in enumerate(members[-2:], start = 1))
+        message1 = "## Hero/Battle pass:\n" + "\n".join(f"{number}. {member.mention}" for number, member in enumerate(members[:5], start = 1))
+        message2 = "## Set:\n" + "\n".join(f"{number}. {member.mention}" for number, member in enumerate(members[-3:], start = 1))
 
         await ctx.send(message1 + "\n" + message2)
 
