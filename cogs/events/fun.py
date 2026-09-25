@@ -25,7 +25,10 @@ class FunCog(commands.Cog):
 
         members = list(members)
         random.shuffle(members)
-        await ctx.send("\n".join(f"{number}: {member.mention}" for number, member in enumerate(members, start = 1)))
+        message1 = "## Hero/Battle pass:\n" + "\n".join(f"{number}. {member}" for number, member in enumerate(members[:4], start = 1))
+        message2 = "## Set:" + "\n".join(f"{number}. {member}" for number, member in enumerate(members[-2:], start = 1))
+
+        await ctx.send(message1 + "\n" + message2)
 
     @commands.Cog.listener()
     async def on_message(self, message):
