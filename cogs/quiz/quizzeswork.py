@@ -3,7 +3,7 @@ from discord import TextChannel, Interaction, File, Message, Member, TextStyle
 from discord.ui import Modal, View, TextInput
 
 from utils.render_tools import render_factory as render
-from utils.data_tools import collection_to_object
+from utils.data_tools import collection_to_object, collection_to_text, text_to_collection
 from utils.library import colors
 from utils.utils import ntime
 
@@ -71,12 +71,15 @@ class QuizContext:
         await self.close_answer()
         chat, console = self.result()
 
-        self.log = {"Quiz_Type": self.quiz_type, **self.log}
+        log = {"Quiz_Type": self.quiz_type, **self.log}
+        print(log)
+        self.log = collection_to_text(log)
+        print(text_to_collection(self.log, {}))
 
-        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
-            json.dump(self.log, file, ensure_ascii = False, indent = 4)
+        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".txt", delete = False) as file:
+            file.write(self.log)
         log_path = pathlib.Path(file.name)
-        log_file = File(log_path, filename = "quiz_log.json")
+        log_file = File(log_path, filename = "quiz_log.txt")
 
         if len("".join(chat)) <= 1950:
             await self.log_channel.send("# Викторина завершена!" + "".join(chat), file = log_file)
@@ -99,7 +102,7 @@ class QuizContext:
 
 
 async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel, flag: asyncio.Event):
-    context = QuizContext(channels = [channel for channel in quiz_channels.values()], quiz_type = "Autoquiz")
+    context = QuizContext(channels = [channel for channel in quiz_channels.values() if channel is not None], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
     for question in quiz:
@@ -133,12 +136,12 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
     correct_answer = [question["Answers"][0].lower()] if question["Type"] != "SEQUENTIAL" else [answer.lower() for answer in question["Answers"].copy()]
 
     data = collection_to_object({"correct_answer": None,
-                                "context": context,
-                                "members": None,
-                                "points": question["Points"],
-                                "end_text": text["Button_End_Answer"],
-                                "log_block": None},
-                                [member_check, end_button])
+                                 "context": context,
+                                 "members": None,
+                                 "points": question["Points"],
+                                 "end_text": text["Button_End_Answer"],
+                                 "log_block": None},
+                                 [member_check, end_button])
 
     data.log_block = {"type": question["Type"],
                       "question": question["Question"],
