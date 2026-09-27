@@ -13,8 +13,10 @@ class FunCog(commands.Cog):
     @commands.command()
     @check({check_list["Channels"]["испытательный-полигон"]})
     async def price(self, ctx: commands.Context, channel: discord.TextChannel):
+        if not channel:
+            return await ctx.reply("Укажите канал", delete_after = 5)
         members: set[discord.Member] = set()
-        async for message in channel.history(limit = None):
+        async for message in channel.history(limit = 5000):
             if message.author not in members:
                 members.add(message.author)
 
