@@ -113,10 +113,10 @@ class AutoquizCog(Cog):
 
             
 
-    @commands.command(description = "навигация по файлам autoquiz (не готово)")
-    @check({check_list["Roles"]["Giveaways_Organiser"]})
-    async def quizsearch(self, ctx: Context):
-        ...
+    # @commands.command(description = "навигация по файлам autoquiz")
+    # @check({check_list["Roles"]["Giveaways_Organiser"]})
+    # async def quizsearch(self, ctx: Context):
+    #     ...
 
 
 async def start_button(self, interaction: Interaction):
