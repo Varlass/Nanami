@@ -76,10 +76,10 @@ class QuizContext:
         self.log = collection_to_text(log)
         print(text_to_collection(self.log, {}))
 
-        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".txt", delete = False) as file:
-            file.write(self.log)
+        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
+            json.dump(self.log, file, indent = 4, ensure_ascii = False)
         log_path = pathlib.Path(file.name)
-        log_file = File(log_path, filename = "quiz_log.txt")
+        log_file = File(log_path, filename = "quiz_log.json")
 
         if len("".join(chat)) <= 1950:
             await self.log_channel.send("# Викторина завершена!" + "".join(chat), file = log_file)
