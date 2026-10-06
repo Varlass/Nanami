@@ -7,7 +7,7 @@ SYNTAX = {
 "separator": ":"
 }
 
-DEFAULT_CLASS_NAME: str = "Object"
+DEFAULT_NAME: str = "Object"
 
 CHECKING_KEY = frozenset({""})
 CHECKING_VALUE = frozenset()

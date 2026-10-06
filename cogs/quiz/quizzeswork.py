@@ -81,7 +81,7 @@ class QuizContext:
         log_path = pathlib.Path(file.name)
         log_file = File(log_path, filename = "quiz_log.json")
 
-        if len("".join(chat)) <= 1950:
+        if len("".join(chat)) <= 1950 and self.log_channel:
             await self.log_channel.send("# Викторина завершена!" + "".join(chat), file = log_file)
 
         else:
@@ -91,7 +91,8 @@ class QuizContext:
             text_file = File(text_path, filename = "quiz_result.txt")
 
             try:
-                await self.log_channel.send("# Викторина завершена!", files = [text_file, log_file])
+                if self.log_channel:
+                    await self.log_channel.send("# Викторина завершена!", files = [text_file, log_file])
 
             finally:
                 text_path.unlink(True)
@@ -101,7 +102,7 @@ class QuizContext:
         print(f"\033[34m[{ntime().strftime("%H:%M:%S")}]\nВикторина завершена!" + "".join(console) + "\033[0m")
 
 
-async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel, flag: asyncio.Event):
+async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel = None, flag: asyncio.Event = None):
     context = QuizContext(channels = [channel for channel in quiz_channels.values() if channel is not None], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
@@ -123,11 +124,13 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChanne
         await asyncio.sleep(60)
         await context.close_answer()
 
-        if flag.is_set():
+        if flag and flag.is_set():
             break
 
         _, console = context.result()
-        await log_channel.send("## Промежуточные результаты:" + "".join(console))
+
+        if log_channel:
+            await log_channel.send("## Промежуточные результаты:" + "".join(console))
 
     await context.close_quiz()
 

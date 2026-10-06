@@ -8,7 +8,7 @@ from os import getenv
 load_dotenv()
 
 from utils.check import check_list
-from data.manager import db_manage, default_data
+from data.manager import sqlitemanager, default_data
 
 
 class MyBot(Bot):
@@ -77,4 +77,4 @@ if __name__ == "__main__":
         bot.run(TOKEN)
 
     finally:
-        db_manage.close_all()
+        sqlitemanager.close_all()

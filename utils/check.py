@@ -16,7 +16,10 @@ except KeyError:
     white_list = set()
 
 
-def check(checks: set[int] = set(), *, bypass: bool = True): # Декоратор проверки id.
+def check(checks: set[int]|int = set(), *, bypass: bool = True): # Декоратор проверки id.
+    if isinstance(checks, int):
+        checks = {checks}
+
     if not isinstance(checks, set):
         raise TypeError("Цель проверки должна быть множеством.")
 

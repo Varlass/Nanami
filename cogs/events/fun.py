@@ -10,21 +10,6 @@ class FunCog(commands.Cog):
         self.funcs = {self.activity,
                       self.reaction}
 
-    @commands.command()
-    @check({check_list["Channels"]["испытательный-полигон"]})
-    async def price(self, ctx: commands.Context, channel: discord.TextChannel):
-        members: set[discord.Member] = set()
-        async for message in channel.history(limit = 500):
-            if message.author not in members:
-                members.add(message.author)
-
-        members: list[discord.Member] = list(members)
-        random.shuffle(members)
-        message1 = "## Hero/Battle pass:\n" + "\n".join(f"{number}. {member.mention}" for number, member in enumerate(members[:5], start = 1))
-        message2 = "## Set:\n" + "\n".join(f"{number}. {member.mention}" for number, member in enumerate(members[-3:], start = 1))
-
-        await ctx.send(message1 + "\n" + message2)
-
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author == self.bot.user:

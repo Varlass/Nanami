@@ -1,7 +1,6 @@
 data/*
-!data/manager.py
-!data/default_data
-!data/default_data/**
+!data/manager/
+!data/default_data/
 
 .env
 __pycache__/

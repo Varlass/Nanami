@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
 
-from data.manager import DIR, json_manage
+from data.manager import FileManager
 from utils.data_tools import text_to_collection
 from utils.check import check, check_list
 from utils import render_tools as render
@@ -13,7 +13,6 @@ from utils.library import colors
 from cogs.quiz.quizzeswork import autoquiz_manager
 
 
-dir = DIR/"quiz_data"
 langs = ["RU", "EN"]
 
 class AutoquizCog(Cog):
@@ -23,17 +22,16 @@ class AutoquizCog(Cog):
     @commands.command(description = "запуск автоматической викторины")
     @check({check_list["Roles"]["Giveaways_Organiser"]})
     async def autoquiz(self, ctx: Context):
-        json_dict = json_manage.read("list", dir = dir)
+        json_dict = FileManager("quiz_data/list.json").read()
 
         if not json_dict["use"]:
             return await ctx.send("Файлы автовикторины отсутствуют.")
 
         quiz_file = json_dict["quizzes"][json_dict["use"]]["name"]
 
-        with open(dir/quiz_file, "r", encoding = 'utf-8') as file:
-            quiz_text = file.read()
+        quiz_text = FileManager(f"quiz_data/{quiz_file}").read()
 
-        quiz_dict = text_to_collection(quiz_text, [])
+        quiz_dict = text_to_collection(quiz_text, list)
         random.shuffle(quiz_dict)
         channels = {lang: None for lang in langs}
 
@@ -79,7 +77,8 @@ class AutoquizCog(Cog):
             await ctx.reply(file = File(dir/"quiz_table.txt"), mention_author = False)
 
         else:
-            json_dict = json_manage.read("list", dir = dir)
+            file = FileManager("quiz_data/list.json")
+            json_dict = file.read()
             index = max(map(int, json_dict["quizzes"]), default = 0)
             new_dict = {}
 
@@ -106,7 +105,7 @@ class AutoquizCog(Cog):
 
             json_dict["use"] = str(index)
             json_dict["quizzes"].update(new_dict)
-            json_manage.write("list", json_dict, dir = dir)
+            file.write(json_dict)
 
             if new_dict:
                 await ctx.send(f"Файлы `{",".join([file["name"] for file in new_dict.values()])}` успешно сохранены.")
