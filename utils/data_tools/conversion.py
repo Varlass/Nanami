@@ -14,14 +14,14 @@ def text_to_collection(text: str, collection: Collection) -> Collection:
     collection has the type specefied by the collection argument.
     """
 
+    if isinstance(collection, type):
+        collection = collection()
+
     if not isinstance(text, str):
         raise TypeError(f"argument 'text' must be a str, got {type(text).__name__}")
 
     if not isinstance(collection, Collection):
         raise TypeError(f"argument 'collection' must be a dict, list, tuple, set or None, got {type(collection).__name__}") 
-
-    if isinstance(collection, type):
-        collection = collection()
 
     tokens = text_tokeniser(text, type(collection))
     checking(tokens)
@@ -134,6 +134,9 @@ def object_to_collection(obj: object, collection: Collection|None = None) -> Col
     input object. If no collection is specified, a dictionary is used.
     """
 
+    if isinstance(collection, type):
+        collection = collection()
+
     if collection is None:
         collection = {}
 
@@ -142,9 +145,6 @@ def object_to_collection(obj: object, collection: Collection|None = None) -> Col
 
     if not isinstance(collection, Collection):
         raise TypeError(f"argument 'collection' must be a dict, list, tuple, set or None, got {type(collection).__name__}")
-
-    if isinstance(collection, type):
-        collection = collection()
 
     tokens = tokeniser(obj, "object")
     checking(tokens)
