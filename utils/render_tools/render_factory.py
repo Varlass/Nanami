@@ -158,7 +158,7 @@ class _ButtonFactory(B):
 
 class _ChannelSelectFactory(ChannelSelect):
     def __init__(self, select: Select, data: Any):
-        super().__init__(self, custom_id = select.custom_id, channel_types = select.select_type[1], placeholder = select.placeholder, row = select.row)
+        super().__init__(custom_id = select.custom_id, channel_types = select.select_type[1], placeholder = select.placeholder, row = select.row)
         self.select = select
         self.data = data
 
@@ -167,7 +167,7 @@ class _ChannelSelectFactory(ChannelSelect):
 
 class _SelectFactory(S):
     def __init__(self, select: Select, data: Any):
-        super().__init__(self, custom_id = select.custom_id, placeholder = select.placeholder, options = select.select_type[1], row = select.row)
+        super().__init__(custom_id = select.custom_id, placeholder = select.placeholder, options = select.select_type[1], row = select.row)
         self.select = select
         self.data = data
 
