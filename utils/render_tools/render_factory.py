@@ -46,7 +46,7 @@ class Select:
     callback: Callable
     select_type: Any
     placeholder: str = "Select"
-    custom_id: str = "MISSING"
+    custom_id: str = None
     row: int|None = None
 
 @dataclass
