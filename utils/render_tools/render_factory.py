@@ -139,7 +139,7 @@ def _embed_factory(embed: Embed) -> E:
 
 class _ViewFactory(V):
     def __init__(self, view: View):
-        V.__init__(timeout = view.timeout)
+        super().__init__(timeout = view.timeout)
 
         for button in view.buttons:
             self.add_item(_ButtonFactory(button, view.data))
@@ -149,7 +149,7 @@ class _ViewFactory(V):
 
 class _ButtonFactory(B):
     def __init__(self, button: Button, data: Any):
-        B.__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
+        super().__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
         self.button = button
         self.data = data
 
@@ -158,7 +158,7 @@ class _ButtonFactory(B):
 
 class _ChannelSelectFactory(ChannelSelect):
     def __init__(self, select: Select, data: Any):
-        ChannelSelect.__init__(self, custom_id = select.custom_id, channel_types = select.select_type[1], placeholder = select.placeholder, row = select.row)
+        super().__init__(self, custom_id = select.custom_id, channel_types = select.select_type[1], placeholder = select.placeholder, row = select.row)
         self.select = select
         self.data = data
 
@@ -167,7 +167,7 @@ class _ChannelSelectFactory(ChannelSelect):
 
 class _SelectFactory(S):
     def __init__(self, select: Select, data: Any):
-        S.__init__(self, custom_id = select.custom_id, placeholder = select.placeholder, options = select.select_type[1], row = select.row)
+        super().__init__(self, custom_id = select.custom_id, placeholder = select.placeholder, options = select.select_type[1], row = select.row)
         self.select = select
         self.data = data
 
