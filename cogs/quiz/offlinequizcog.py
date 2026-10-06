@@ -49,7 +49,7 @@ class OfflineQuizCog(Cog):
                                                     data = {"quiz": quiz_dict,
                                                             "lang": lang},
                                                     selects = [render.Select(callback = lang_select,
-                                                                             select_type = render.SelectType.option([SelectOption(label = lang, value = lang)] for lang in LANGS),
+                                                                             select_type = render.SelectType.option([SelectOption(label = lang, value = lang) for lang in LANGS]),
                                                                              placeholder = f"Выберите язык")],
                                                     buttons = [render.Button(callback = start_button,
                                                                              label = "Start",
