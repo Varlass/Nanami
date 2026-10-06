@@ -3,7 +3,6 @@ from typing import Any, Callable
 from discord import Interaction, File, ButtonStyle, Embed as E, ChannelType
 from discord.ui import View as V, Button as B, Modal as M, Select as S, ChannelSelect, TextInput
 
-MISSING = object()
 
 @dataclass
 class Field:
@@ -47,7 +46,7 @@ class Select:
     callback: Callable
     select_type: Any
     placeholder: str|None = None
-    custom_id: str = MISSING
+    custom_id: str = ""
     row: int|None = None
 
 @dataclass
