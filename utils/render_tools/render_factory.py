@@ -45,8 +45,8 @@ class Button:
 class Select:
     callback: Callable
     select_type: Any
-    placeholder: str|None = None
-    custom_id: str = ""
+    placeholder: str = "Select"
+    custom_id: str = "MISSING"
     row: int|None = None
 
 @dataclass
