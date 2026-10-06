@@ -3,6 +3,7 @@ from typing import Any, Callable
 from discord import Interaction, File, ButtonStyle, Embed as E, ChannelType
 from discord.ui import View as V, Button as B, Modal as M, Select as S, ChannelSelect, TextInput
 
+MISSING = object()
 
 @dataclass
 class Field:
@@ -46,7 +47,7 @@ class Select:
     callback: Callable
     select_type: Any
     placeholder: str|None = None
-    custom_id: str|None = None
+    custom_id: str = MISSING
     row: int|None = None
 
 @dataclass
@@ -138,7 +139,7 @@ def _embed_factory(embed: Embed) -> E:
 
 class _ViewFactory(V):
     def __init__(self, view: View):
-        super().__init__(timeout = view.timeout)
+        V().__init__(timeout = view.timeout)
 
         for button in view.buttons:
             self.add_item(_ButtonFactory(button, view.data))
@@ -148,7 +149,7 @@ class _ViewFactory(V):
 
 class _ButtonFactory(B):
     def __init__(self, button: Button, data: Any):
-        super().__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
+        B().__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
         self.button = button
         self.data = data
 
