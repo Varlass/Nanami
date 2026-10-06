@@ -139,7 +139,7 @@ def _embed_factory(embed: Embed) -> E:
 
 class _ViewFactory(V):
     def __init__(self, view: View):
-        V().__init__(timeout = view.timeout)
+        V.__init__(timeout = view.timeout)
 
         for button in view.buttons:
             self.add_item(_ButtonFactory(button, view.data))
@@ -149,7 +149,7 @@ class _ViewFactory(V):
 
 class _ButtonFactory(B):
     def __init__(self, button: Button, data: Any):
-        B().__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
+        B.__init__(style = button.style, label = button.label, disabled = button.disabled, custom_id = button.custom_id, row = button.row)
         self.button = button
         self.data = data
 
