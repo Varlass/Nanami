@@ -63,7 +63,7 @@ class OfflineQuizCog(Cog):
 
 
 async def lang_select(self, interaction: Interaction):
-    lang = interaction.guild.get_channel(self.values[0].id)
+    lang = interaction.guild.get_channel(self.values[0])
 
     if self.data == lang:
         self.data = None
