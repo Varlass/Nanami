@@ -74,12 +74,10 @@ class QuizContext:
         chat, console = self.result()
 
         log = {"Quiz_Type": self.quiz_type, **self.log}
-        print(log)
         self.log = collection_to_text(log)
-        print(text_to_collection(self.log, {}))
 
         with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
-            dump(self.log, file, indent = 4, ensure_ascii = False)
+            file.write(self.log)
         log_path = pathlib.Path(file.name)
         log_file = File(log_path, filename = "quiz_log.json")
 

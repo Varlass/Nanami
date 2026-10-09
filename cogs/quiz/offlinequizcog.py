@@ -92,6 +92,7 @@ async def start_button(self, interaction: Interaction):
 
     message_content = render.render(message)
 
+    await self.data["log_thread"].send(f"{interaction.user.mention}")
     await interaction.channel.send(**message_content)
     await interaction.response.defer()
 
