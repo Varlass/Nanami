@@ -139,7 +139,7 @@ def text_tokeniser(text: str, root_type: type[Collection]) -> list[Token]:
                     token.value = SYNTAX["types"][marker]
                     token.high = len(line) - len(line.lstrip(marker))
 
-                    while parents and parents[-1].high >= token.high:
+                    while parents and parents[-1].high <= token.high:
                         parents.pop()
                     token.parent = parents[-1] if parents else root_type
 

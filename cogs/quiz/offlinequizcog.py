@@ -15,9 +15,9 @@ from cogs.quiz.quizzeswork import autoquiz_manager
 
 LANGS: list[str] = ["RU", "EN"]
 descriptions = {"RU": ("Начать викторину",
-                       "Приготовься!\nВикторина начнётся через 10 секунд."),
+                       "Приготовься, {}!\nВикторина начнётся через 10 секунд."),
                 "EN": ("Start Quiz",
-                       "Get ready! Quiz starts in 10 seconds.")}
+                       "Get ready, {}! Quiz starts in 10 seconds.")}
 
 class OfflineQuizCog(Cog):
     def __init__(self, bot: Bot):
@@ -37,16 +37,19 @@ class OfflineQuizCog(Cog):
 
         quiz_dict = text_to_collection(quiz_text, list)
         shuffle(quiz_dict)
-        lang = None
+
+        log_thread = await ctx.channel.create_thread(name = f"{quiz_file} log", type = ChannelType.private_thread, invitable = False)
+        lang = [None]
 
         message = render.Message(data = lang,
                                  embeds = [render.Embed(title = "Выберите язык викторины:",
-                                                        description = lambda lang: (f"Файл автовикторины: `{quiz_file}`\n"
-                                                                                    f"- {lang or "не указан"}"),
+                                                        description = lambda data: (f"Файл автовикторины: `{quiz_file}`\n"
+                                                                                    f"- {data[0] or "не указан"}"),
                                                         color = CREAM)],
 
                                  view = render.View(timeout = 6000,
                                                     data = {"quiz": quiz_dict,
+                                                            "log_thread": log_thread,
                                                             "lang": lang},
                                                     selects = [render.Select(callback = lang_select,
                                                                              select_type = render.SelectType.option([SelectOption(label = lang, value = lang) for lang in LANGS]),
@@ -62,42 +65,47 @@ class OfflineQuizCog(Cog):
         await ctx.send(**message_content)
 
 
-async def lang_select(self, interaction: Interaction):
-    lang = interaction.guild.get_channel(self.values[0])
 
-    if self.data == lang:
-        self.data = None
+async def lang_select(self, interaction: Interaction):
+    lang = self.values[0]
+
+    if self.data["lang"][0] == lang:
+        self.data["lang"][0] = None
 
     else:
-        self.data = lang
+        self.data["lang"][0] = lang
 
-    await interaction.response.edit_message(**render.render(self.data["message"]))
+    message_content = render.render(self.data["message"])
+    await interaction.response.edit_message(**message_content)
 
 async def start_button(self, interaction: Interaction):
-    if not self.data["lang"]:
+    lang = self.data["lang"][0]
+
+    if not lang:
         return await interaction.response.send_message("Ещё не выбран язык.", ephemeral = True)
 
-    message = render.Message(embeds = [render.Embed(title = self.data["lang"], description = descriptions[self.data["lang"][0]])],
+    message = render.Message(embeds = [render.Embed(title = lang, description = descriptions[lang][0])],
                              view = render.View(data = self.data,
-                                                buttons = render.Button(callback = start_quiz,
+                                                buttons = [render.Button(callback = start_quiz,
                                                                         style = ButtonStyle.green,
-                                                                        label = "Start",)))
+                                                                        label = "Start",)]))
 
     message_content = render.render(message)
 
     await interaction.channel.send(**message_content)
+    await interaction.response.defer()
 
 
 async def start_quiz(self, interaction: Interaction):
-    thread_name = f"{interaction.user.display_name}'s quiz"
+    thread = await interaction.channel.create_thread(name = f"{interaction.user.display_name}'s quiz", type = ChannelType.private_thread, invitable = False)
 
-    thread = await interaction.channel.create_thread(name = thread_name, type = ChannelType.private_thread, invitable = False)
+    await interaction.response.defer()
 
-    await thread.send(descriptions[self.data["lang"][1]])
+    await thread.send(descriptions[self.data["lang"][0]][1].format(interaction.user.mention))
 
     await sleep(10)
 
-    await autoquiz_manager(self.data["quiz_data"], {thread_name: thread})
+    await autoquiz_manager(self.data["quiz"], {self.data["lang"][0]: thread}, self.data["log_thread"], time = 10)
 
 
 async def setup(bot: Bot):

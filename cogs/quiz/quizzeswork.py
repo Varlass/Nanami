@@ -1,6 +1,8 @@
-import asyncio, tempfile, pathlib, random, json
-from discord import TextChannel, Interaction, File, Message, Member, TextStyle
+import asyncio, tempfile, pathlib
+from discord import TextChannel, Thread, Interaction, File, Message, Member, TextStyle
 from discord.ui import Modal, View, TextInput
+from json import dump
+from random import shuffle
 
 from utils.render_tools import render_factory as render
 from utils.data_tools import collection_to_object, collection_to_text, text_to_collection
@@ -16,10 +18,10 @@ translate = {"RU": {"Title": "Вопрос №{}",
                     "Button_End_Answer": "Your answer was heard"}}
 
 class QuizContext:
-    def __init__(self, channels: list[TextChannel], quiz_type: str  = "Quiz"):
+    def __init__(self, channels: list[TextChannel|Thread], quiz_type: str  = "Quiz"):
         self.quiz_type = quiz_type
-        self.log_channel: TextChannel|None = None
-        self.channels: dict[TextChannel, set] = {channel: set() for channel in channels}
+        self.log_channel: TextChannel|Thread|None = None
+        self.channels: dict[TextChannel|Thread, set] = {channel: set() for channel in channels}
 
         self.quiz_number: int = 0
         self.messages: dict[Message, View] = {}
@@ -77,7 +79,7 @@ class QuizContext:
         print(text_to_collection(self.log, {}))
 
         with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
-            json.dump(self.log, file, indent = 4, ensure_ascii = False)
+            dump(self.log, file, indent = 4, ensure_ascii = False)
         log_path = pathlib.Path(file.name)
         log_file = File(log_path, filename = "quiz_log.json")
 
@@ -102,7 +104,7 @@ class QuizContext:
         print(f"\033[34m[{ntime().strftime("%H:%M:%S")}]\nВикторина завершена!" + "".join(console) + "\033[0m")
 
 
-async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel], log_channel: TextChannel = None, flag: asyncio.Event = None):
+async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel|Thread], log_channel: TextChannel|Thread = None, flag: asyncio.Event = None, *, time: float = 60.0):
     context = QuizContext(channels = [channel for channel in quiz_channels.values() if channel is not None], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
@@ -116,12 +118,13 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChanne
             question_dict = {"Number": number,
                              "Type": question["Type"],
                              "Question": question["QUESTIONS"][lang],
+                             "Image": question["QUESTIONS"]["Image"],
                              "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
                              "Points": question["Points"]}
 
             context.log.setdefault(lang, {})[number] = await quiz_manager(question_dict, translate[lang], channel, context)
 
-        await asyncio.sleep(60)
+        await asyncio.sleep(time)
         await context.close_answer()
 
         if flag and flag.is_set():
@@ -135,11 +138,10 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChanne
     await context.close_quiz()
 
 
-async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel, context: QuizContext):
-    correct_answer = [question["Answers"][0].lower()] if question["Type"] != "SEQUENTIAL" else [answer.lower() for answer in question["Answers"].copy()]
+async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel|Thread, context: QuizContext):
+    correct_answer = [question["Answers"][0].lower()] if question["Type"] != "SEQUENTIAL" else [answer.lower() for answer in question["Answers"]]
 
     data = collection_to_object({"correct_answer": None,
-                                 "context": context,
                                  "members": None,
                                  "points": question["Points"],
                                  "end_text": text["Button_End_Answer"],
@@ -154,10 +156,11 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
                       "started_at": int(ntime().timestamp()),
                       "ended_at": None,
                       "users_data": []}
+    data.context = context
     data.correct_answer = correct_answer
     data.members = {}
 
-    random.shuffle(question["Answers"])
+    shuffle(question["Answers"])
 
     render_view = render.View(data = data,
                        timeout = 3600,
@@ -167,6 +170,7 @@ async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: 
 
     render_message = render.Message(embeds = [render.Embed(title = text["Title"].format(question["Number"]),
                                                            description = question["Question"],
+                                                           image = question["Image"],
                                                            color = colors.BLUE)],
                                     view = render_view)
 

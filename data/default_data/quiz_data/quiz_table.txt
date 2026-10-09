@@ -7,6 +7,8 @@ RU:
 
 EN:
 
+Image:
+
 == ANSWERS ==
 - RU -
 1:
@@ -23,6 +25,8 @@ Points: 1
 RU:
 
 EN:
+
+Image:
 
 == ANSWERS ==
 - RU -
@@ -46,6 +50,8 @@ Points: 1
 RU:
 
 EN:
+
+Image:
 
 == ANSWERS ==
 - RU -
