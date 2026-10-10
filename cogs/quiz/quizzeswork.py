@@ -76,7 +76,7 @@ class QuizContext:
         log = {"Quiz_Type": self.quiz_type, **self.log}
         self.log = collection_to_text(log)
 
-        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".json", delete = False) as file:
+        with tempfile.NamedTemporaryFile(mode = "w", encoding = "utf-8", suffix = ".txt", delete = False) as file:
             file.write(self.log)
         log_path = pathlib.Path(file.name)
         log_file = File(log_path, filename = "quiz_log.json")

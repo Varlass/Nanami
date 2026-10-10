@@ -36,7 +36,9 @@ class OfflineQuizCog(Cog):
         quiz_text = FileManager(f"quiz_data/{quiz_file}").read()
 
         quiz_dict = text_to_collection(quiz_text, list)
-        shuffle(quiz_dict)
+
+        if False:
+            shuffle(quiz_dict)
 
         log_thread = await ctx.channel.create_thread(name = f"{quiz_file} log", type = ChannelType.private_thread, invitable = False)
         lang = [None]
@@ -106,7 +108,7 @@ async def start_quiz(self, interaction: Interaction):
 
     await sleep(10)
 
-    await autoquiz_manager(self.data["quiz"], {self.data["lang"][0]: thread}, self.data["log_thread"], time = 20, inter_resp = False)
+    await autoquiz_manager(self.data["quiz"], {self.data["lang"][0]: thread}, self.data["log_thread"], time = 30, inter_resp = False)
 
 
 async def setup(bot: Bot):
