@@ -15,9 +15,11 @@ from cogs.quiz.quizzeswork import autoquiz_manager
 
 LANGS: list[str] = ["RU", "EN"]
 descriptions = {"RU": ("Начать викторину",
-                       "Приготовься, {}!\nВикторина начнётся через 10 секунд."),
+                       "Приготовься, {}!\nВикторина начнётся через 10 секунд.",
+                       "Вы уже учавствовали в викторине."),
                 "EN": ("Start Quiz",
-                       "Get ready, {}! Quiz starts in 10 seconds.")}
+                       "Get ready, {}! Quiz starts in 10 seconds.",
+                       "You have already participated in Quiz.")}
 
 class OfflineQuizCog(Cog):
     def __init__(self, bot: Bot):
@@ -52,7 +54,8 @@ class OfflineQuizCog(Cog):
                                  view = render.View(timeout = 6000,
                                                     data = {"quiz": quiz_dict,
                                                             "log_thread": log_thread,
-                                                            "lang": lang},
+                                                            "lang": lang,
+                                                            "users": set()},
                                                     selects = [render.Select(callback = lang_select,
                                                                              select_type = render.SelectType.option([SelectOption(label = lang, value = lang) for lang in LANGS]),
                                                                              placeholder = f"Выберите язык")],
@@ -100,6 +103,9 @@ async def start_button(self, interaction: Interaction):
 
 
 async def start_quiz(self, interaction: Interaction):
+    if interaction.user.id in self.data["users"]:
+        return await interaction.response.send_message(self.data["lang"][3], ephemeral = True)
+
     thread = await interaction.channel.create_thread(name = f"{interaction.user.display_name}'s quiz", type = ChannelType.private_thread, invitable = False)
 
     await interaction.response.defer()
