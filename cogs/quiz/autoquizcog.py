@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
 
-from data.manager import FileManager
+from data.manager import DIR, FileManager
 from utils.data_tools import text_to_collection
 from utils.check import check, check_list
 from utils import render_tools as render
@@ -74,7 +74,7 @@ class AutoquizCog(Cog):
         attachments = ctx.message.attachments
 
         if not attachments:
-            await ctx.reply(file = File(dir/"quiz_table.txt"), mention_author = False)
+            await ctx.reply(file = File(DIR/"quiz_data/quiz_table.txt"), mention_author = False)
 
         else:
             file = FileManager("quiz_data/list.json")
