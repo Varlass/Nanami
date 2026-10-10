@@ -16,10 +16,10 @@ from cogs.quiz.quizzeswork import autoquiz_manager
 LANGS: list[str] = ["RU", "EN"]
 descriptions = {"RU": ("Начать викторину",
                        "Приготовься, {}!\nВикторина начнётся через 10 секунд.",
-                       "Вы уже учавствовали в викторине."),
+                       "Вы уже учавствовали в викторине: {}"),
                 "EN": ("Start Quiz",
                        "Get ready, {}! Quiz starts in 10 seconds.",
-                       "You have already participated in Quiz.")}
+                       "You have already participated in Quiz: {}")}
 
 class OfflineQuizCog(Cog):
     def __init__(self, bot: Bot):
@@ -55,7 +55,7 @@ class OfflineQuizCog(Cog):
                                                     data = {"quiz": quiz_dict,
                                                             "log_thread": log_thread,
                                                             "lang": lang,
-                                                            "users": set()},
+                                                            "users": dict()},
                                                     selects = [render.Select(callback = lang_select,
                                                                              select_type = render.SelectType.option([SelectOption(label = lang, value = lang) for lang in LANGS]),
                                                                              placeholder = f"Выберите язык")],
@@ -104,9 +104,11 @@ async def start_button(self, interaction: Interaction):
 
 async def start_quiz(self, interaction: Interaction):
     if interaction.user.id in self.data["users"]:
-        return await interaction.response.send_message(self.data["lang"][3], ephemeral = True)
+        return await interaction.response.send_message(descriptions[self.data["lang"][0]][3].format(self.data["users"][interaction.user.id].mention), ephemeral = True)
 
     thread = await interaction.channel.create_thread(name = f"{interaction.user.display_name}'s quiz", type = ChannelType.private_thread, invitable = False)
+
+    self.data["users"][interaction.user.id] = thread
 
     await interaction.response.defer()
 
