@@ -5,7 +5,7 @@ from json import dump
 from random import shuffle
 
 from utils.render_tools import render_factory as render
-from utils.data_tools import collection_to_object, collection_to_text, text_to_collection
+from utils.data_tools import collection_to_object, collection_to_text
 from utils.library import colors
 from utils.utils import ntime
 
@@ -102,7 +102,7 @@ class QuizContext:
         print(f"\033[34m[{ntime().strftime("%H:%M:%S")}]\nВикторина завершена!" + "".join(console) + "\033[0m")
 
 
-async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel|Thread], log_channel: TextChannel|Thread = None, flag: asyncio.Event = None, *, time: float = 60.0):
+async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChannel|Thread], log_channel: TextChannel|Thread = None, flag: asyncio.Event = None, *, time: float = 60.0, inter_resp: bool = True):
     context = QuizContext(channels = [channel for channel in quiz_channels.values() if channel is not None], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
@@ -130,7 +130,7 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChanne
 
         _, console = context.result()
 
-        if log_channel:
+        if log_channel and inter_resp:
             await log_channel.send("## Промежуточные результаты:" + "".join(console))
 
     await context.close_quiz()

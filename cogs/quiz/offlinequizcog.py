@@ -106,7 +106,7 @@ async def start_quiz(self, interaction: Interaction):
 
     await sleep(10)
 
-    await autoquiz_manager(self.data["quiz"], {self.data["lang"][0]: thread}, self.data["log_thread"], time = 10)
+    await autoquiz_manager(self.data["quiz"], {self.data["lang"][0]: thread}, self.data["log_thread"], time = 20, inter_resp = False)
 
 
 async def setup(bot: Bot):
