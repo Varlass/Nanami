@@ -96,7 +96,7 @@ class AutoquizCog(Cog):
                 if attachment.filename == "quiz_table.txt":
                     attachment.filename = f"quiz_number_{index}.txt"
 
-                await attachment.save(dir/attachment.filename)
+                await attachment.save(DIR/"quiz_data"/attachment.filename)
                 new_dict[str(index)] = {"name": attachment.filename,
                                         "comment": comment,
                                         "added_at": int(ntime().timestamp()),
