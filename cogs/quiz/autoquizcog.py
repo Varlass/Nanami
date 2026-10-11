@@ -136,7 +136,7 @@ async def start_button(self, interaction: Interaction):
     await interaction.response.edit_message(view = self.view)
 
     await log_channel.send("# Викторина началась!")
-    await autoquiz_manager(quiz, quiz_channels, log_channel, self.data["flag"])
+    await autoquiz_manager(quiz, quiz_channels, log_channel, self.data["flag"], time = 5)
 
     for children in self.view.children:
         if children.custom_id == "stop_button":
