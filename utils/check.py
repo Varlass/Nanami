@@ -23,7 +23,7 @@ def check(checks: set[int]|int = set(), *, bypass: bool = True): # Декора�
     if not isinstance(checks, set):
         raise TypeError("Цель проверки должна быть множеством.")
 
-    effective_checks = checks|white_list if bypass else checks
+    checks = checks|white_list if bypass else checks
 
     async def predicate(source: Context|Interaction) -> bool:
         context = Unifer(source)
@@ -31,11 +31,12 @@ def check(checks: set[int]|int = set(), *, bypass: bool = True): # Декора�
         ids = {context.user.id,
                *{role.id for role in context.user.roles},
                context.channel.id,
-               context.guild.id}
+               context.guild.id,
+               context.guild.owner_id}
         
         ids.discard(None)
 
-        if ids & effective_checks:
+        if ids & checks:
             return True
 
         raise CheckFailure()

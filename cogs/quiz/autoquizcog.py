@@ -1,7 +1,8 @@
-import asyncio, random
 from discord.ext import commands
 from discord import Interaction, File, ButtonStyle
 from discord.ext.commands import Cog, Bot, Context
+from random import shuffle
+from asyncio import Event
 
 from data.manager import DIR, FileManager
 from utils.data_tools import text_to_collection
@@ -33,6 +34,9 @@ class AutoquizCog(Cog):
 
         quiz_dict = text_to_collection(quiz_text, list)
 
+        if False:
+            shuffle(quiz_dict)
+
         channels = {lang: None for lang in langs}
 
         message = render.Message(data = {"channels": channels},
@@ -45,7 +49,7 @@ class AutoquizCog(Cog):
                                  view = render.View(timeout = 6000,
                                                     data = {"channels": channels,
                                                             "quiz": quiz_dict,
-                                                            "flag": asyncio.Event()},
+                                                            "flag": Event()},
                                                     selects = [render.Select(callback = lang_select,
                                                                              select_type = render.SelectType.text_channel,
                                                                              custom_id = lang,
@@ -136,7 +140,7 @@ async def start_button(self, interaction: Interaction):
     await interaction.response.edit_message(view = self.view)
 
     await log_channel.send("# Викторина началась!")
-    await autoquiz_manager(quiz, quiz_channels, log_channel, self.data["flag"], time = 5)
+    await autoquiz_manager(quiz, quiz_channels, log_channel, self.data["flag"], time = 30)
 
     for children in self.view.children:
         if children.custom_id == "stop_button":

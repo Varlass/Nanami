@@ -106,34 +106,42 @@ async def autoquiz_manager(quiz: list[dict], quiz_channels: dict[str, TextChanne
     context = QuizContext(channels = [channel for channel in quiz_channels.values() if channel is not None], quiz_type = "Autoquiz")
     context.log_channel = log_channel
 
-    for question in quiz:
-        number = str(context.number())
+    try:
+        for question in quiz:
+            number = str(context.number())
 
-        for lang, channel in quiz_channels.items():
-            if channel == None:
-                continue
+            for lang, channel in quiz_channels.items():
+                if channel == None:
+                    continue
 
-            question_dict = {"Number": number,
-                             "Type": question["Type"],
-                             "Question": question["QUESTIONS"][lang],
-                             "Image": question["QUESTIONS"]["Image"],
-                             "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
-                             "Points": question["Points"]}
+                question_dict = {"Number": number,
+                                "Type": question["Type"],
+                                "Question": question["QUESTIONS"][lang],
+                                "Image": question["QUESTIONS"]["Image"],
+                                "Answers": [answer.strip() for answer in question["ANSWERS"][lang] if answer.strip()],
+                                "Points": question["Points"]}
 
-            context.log.setdefault(lang, {})[number] = await quiz_manager(question_dict, translate[lang], channel, context)
+                context.log.setdefault(lang, {})[number] = await quiz_manager(question_dict, translate[lang], channel, context)
 
-        await asyncio.sleep(time)
-        await context.close_answer()
+            await asyncio.sleep(time)
+            await context.close_answer()
 
-        if flag and flag.is_set():
-            break
+            if flag and flag.is_set():
+                break
 
-        _, console = context.result()
+            _, console = context.result()
 
-        if log_channel and inter_resp:
-            await log_channel.send("## Промежуточные результаты:" + "".join(console))
+            if log_channel and inter_resp:
+                await log_channel.send("## Промежуточные результаты:" + "".join(console))
 
-    await context.close_quiz()
+    except Exception as error:
+        if log_channel:
+            await log_channel.send("При выполнении кода произошла ошибка.")
+            print(error)
+            print(quiz)
+
+    finally:
+        await context.close_quiz()
 
 
 async def quiz_manager(question: dict[str, str], text: dict[str, str], channel: TextChannel|Thread, context: QuizContext):
