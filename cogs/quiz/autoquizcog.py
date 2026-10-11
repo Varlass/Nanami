@@ -32,7 +32,7 @@ class AutoquizCog(Cog):
         quiz_text = FileManager(f"quiz_data/{quiz_file}").read()
 
         quiz_dict = text_to_collection(quiz_text, list)
-        random.shuffle(quiz_dict)
+
         channels = {lang: None for lang in langs}
 
         message = render.Message(data = {"channels": channels},
